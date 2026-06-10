@@ -354,14 +354,16 @@ metrics_i = evaluate_model("Mejorado (contamination=0.05)",  preds_i, decision_i
 metrics_o = evaluate_model("Óptimo (contamination=0.174)",   preds_o, decision_o, y)
 
 # =============================================================================
-# CELDA 9: Matrices de Confusión
+# CELDA 9: Matrices de Confusión (los 3 modelos)
 # =============================================================================
-fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-fig.suptitle('Matrices de Confusión: Predicción vs Ground Truth', fontsize=14, fontweight='bold')
+fig, axes = plt.subplots(1, 3, figsize=(19, 5))
+fig.suptitle('Matrices de Confusión: Comparación de los 3 Modelos', fontsize=14, fontweight='bold')
 
 for ax, metrics, title in zip(axes,
-    [metrics_b, metrics_i],
-    ['Baseline', 'Mejorado']):
+    [metrics_b, metrics_i, metrics_o],
+    ["Baseline\n(contamination='auto')",
+     'Mejorado\n(contamination=0.05)',
+     'Óptimo\n(contamination=0.174)']):
     cm = np.array([[metrics['tn'], metrics['fp']],
                    [metrics['fn'], metrics['tp']]])
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Normal', 'Anomalía'])
@@ -371,13 +373,16 @@ for ax, metrics, title in zip(axes,
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, '05_confusion_matrices.png'), dpi=150, bbox_inches='tight')
 plt.close()
-print("📊 Figura 5 guardada: 05_confusion_matrices.png")
+print("📊 Figura 5 guardada: 05_confusion_matrices.png (3 modelos)")
 
 # =============================================================================
-# CELDA 10: Scatter Plot — Predicción vs Ground Truth
+# CELDA 10: Scatter Plot — Comparación Ground Truth vs Óptimo
 # =============================================================================
+# Usamos el modelo Óptimo (contamination=0.174) porque tiene la misma
+# cantidad de predicciones que anomalías reales → comparación más justa
 fig, axes = plt.subplots(1, 2, figsize=(16, 6))
-fig.suptitle('Predicciones del Modelo Mejorado: Temperature vs Humidity', fontsize=14, fontweight='bold')
+fig.suptitle('Predicciones del Modelo Óptimo (contamination=0.174): Temperature vs Humidity',
+             fontsize=13, fontweight='bold')
 
 # Panel izquierdo: Ground Truth
 ax = axes[0]
@@ -385,20 +390,20 @@ ax.scatter(X['Temperature'][y==0], X['Humidity'][y==0],
            c=PALETTE['normal'], alpha=0.3, s=15, label='Normal (GT)')
 ax.scatter(X['Temperature'][y==1], X['Humidity'][y==1],
            c=PALETTE['anomaly'], alpha=0.7, s=25, label='Anomalía (GT)', zorder=3)
-ax.set_title('Ground Truth', fontweight='bold')
+ax.set_title('Ground Truth (522 anomalías reales)', fontweight='bold')
 ax.set_xlabel('Temperature (norm.)')
 ax.set_ylabel('Humidity (norm.)')
 ax.legend()
 
-# Panel derecho: TP, FP, FN, TN
+# Panel derecho: TP, FP, FN, TN — Modelo Óptimo
 ax = axes[1]
-preds_bin = metrics_i['preds_binary']
+preds_bin_o = metrics_o['preds_binary']
 y_arr = y.values
 
-tp_mask = (preds_bin == 1) & (y_arr == 1)
-fp_mask = (preds_bin == 1) & (y_arr == 0)
-fn_mask = (preds_bin == 0) & (y_arr == 1)
-tn_mask = (preds_bin == 0) & (y_arr == 0)
+tp_mask = (preds_bin_o == 1) & (y_arr == 1)
+fp_mask = (preds_bin_o == 1) & (y_arr == 0)
+fn_mask = (preds_bin_o == 0) & (y_arr == 1)
+tn_mask = (preds_bin_o == 0) & (y_arr == 0)
 
 ax.scatter(X['Temperature'][tn_mask], X['Humidity'][tn_mask],
            c='#2196F3', alpha=0.2, s=12, label=f'TN={tn_mask.sum()}')
@@ -408,7 +413,7 @@ ax.scatter(X['Temperature'][fp_mask], X['Humidity'][fp_mask],
            c='#FF9800', alpha=0.8, s=30, label=f'FP={fp_mask.sum()}', marker='^', zorder=4)
 ax.scatter(X['Temperature'][fn_mask], X['Humidity'][fn_mask],
            c='#9C27B0', alpha=0.8, s=30, label=f'FN={fn_mask.sum()}', marker='x', zorder=4)
-ax.set_title('Predicciones: TP / FP / FN / TN', fontweight='bold')
+ax.set_title(f'Óptimo: TP={tp_mask.sum()} FP={fp_mask.sum()} FN={fn_mask.sum()}', fontweight='bold')
 ax.set_xlabel('Temperature (norm.)')
 ax.set_ylabel('Humidity (norm.)')
 ax.legend(markerscale=1.5, fontsize=9)
@@ -416,7 +421,7 @@ ax.legend(markerscale=1.5, fontsize=9)
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, '06_predictions_scatter.png'), dpi=150, bbox_inches='tight')
 plt.close()
-print("📊 Figura 6 guardada: 06_predictions_scatter.png")
+print("📊 Figura 6 guardada: 06_predictions_scatter.png (modelo óptimo)")
 
 # =============================================================================
 # CELDA 11: Serie Temporal Simulada
