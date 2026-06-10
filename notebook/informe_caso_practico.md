@@ -145,11 +145,11 @@ $$\boxed{s(x, n) = 2^{-\dfrac{E[h(x)]}{c(n)}}}$$
 - $E[h(x)]$ = promedio de $h(x)$ a través de todos los árboles del bosque
 - $c(n)$ = normalizador (función de referencia del BST)
 
-| Condición | h(x) vs c(n) | Score s | Interpretación |
+| Condicion | h(x) vs c(n) | Score s | Interpretacion |
 |---|---|---|---|
-| Anomalía clara | $h(x) \ll c(n)$ | $s \to 1$ | 🔴 Anomalía |
-| Dato ambiguo | $h(x) = c(n)$ | $s = 0.5$ | 🟡 Incierto |
-| Dato normal | $h(x) \gg c(n)$ | $s \to 0$ | 🔵 Normal |
+| Anomalia clara | $h(x) \ll c(n)$ | $s \to 1$ | ANOMALIA |
+| Dato ambiguo | $h(x) = c(n)$ | $s = 0.5$ | Incierto |
+| Dato normal | $h(x) \gg c(n)$ | $s \to 0$ | NORMAL |
 
 **Nota matemática:** Cuando $h(x) = c(n)$, el exponente es $-1$, por lo que $s = 2^{-1} = 0.5$. Esto es el punto de equilibrio definido por la teoría.
 
@@ -334,10 +334,10 @@ Esto se llama SOLAPAMIENTO DE CLASES.
 
 #### ¿Cuándo funciona bien Isolation Forest?
 
-- ✅ Anomalías puntales extremas (ej: temperatura de 150°C cuando el rango normal es 20-40°C)
-- ✅ Anomalías en regiones de baja densidad del espacio de datos
-- ❌ Anomalías que se parecen a datos normales en todas las dimensiones medidas
-- ❌ Anomalías colectivas o de tipo contextual (necesitan otras técnicas)
+- Anomalias puntales extremas (ej: temperatura de 150 C cuando el rango normal es 20-40 C)
+- Anomalias en regiones de baja densidad del espacio de datos
+- No aplica bien cuando las anomalias se parecen a datos normales en todas las dimensiones
+- No aplica bien para anomalias colectivas o contextuales (requieren otras tecnicas)
 
 #### El ROC-AUC como métrica más robusta
 
